@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\User;
+
 test('unauthenticated user cannot store a post', function () {
     $response = $this->post('/posts');
 
@@ -7,7 +9,16 @@ test('unauthenticated user cannot store a post', function () {
 });
 
 test('authenticated user can create a post', function () {
-    $response = $this->actingAs(\App\Models\User::factory()->create())->post('/posts');
+    $user = User::factory()->create();
 
-    $response->assertStatus(200);
+    $response = $this->actingAs($user)->post('/posts', [
+        'user_id' => $user->id,
+        'title' => 'test title',
+        'body' => 'test body',
+        'status' => 'is_published',
+    ]);
+
+    $response->assertRedirect('/');
+
+    $this->assertDatabaseHas('posts', ["title" => "test title"]);
 });
