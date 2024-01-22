@@ -28,7 +28,13 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        Post::create($request->all());
+        $validated = $request->validate([
+            "title" => "required",
+            "body" => "required",
+            "status" => "required",
+        ]);
+
+        auth()->user()->posts()->create($validated);
 
         return to_route('welcome');
     }

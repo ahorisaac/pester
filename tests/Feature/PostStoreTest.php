@@ -1,6 +1,9 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+uses(RefreshDatabase::class);
 
 test('unauthenticated user cannot store a post', function () {
     $response = $this->post('/posts');
@@ -21,4 +24,10 @@ test('authenticated user can create a post', function () {
     $response->assertRedirect('/');
 
     $this->assertDatabaseHas('posts', ["title" => "test title"]);
+});
+
+it("requires title, body and status", function() {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)->post("/posts")->assertSessionHasErrors(["title", "body", "status"]);
 });
