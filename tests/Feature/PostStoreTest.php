@@ -5,6 +5,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
+beforeEach(fn () => $this->user = User::factory()->create());
+
 test('unauthenticated user cannot store a post', function () {
     $response = $this->post('/posts');
 
@@ -12,10 +14,9 @@ test('unauthenticated user cannot store a post', function () {
 });
 
 test('authenticated user can create a post', function () {
-    $user = User::factory()->create();
 
-    $response = $this->actingAs($user)->post('/posts', [
-        'user_id' => $user->id,
+    $response = $this->actingAs($this->user)->post('/posts', [
+        'user_id' => $this->user->id,
         'title' => 'test title',
         'body' => 'test body',
         'status' => 'is_published',
@@ -27,7 +28,22 @@ test('authenticated user can create a post', function () {
 });
 
 it("requires title, body and status", function() {
-    $user = User::factory()->create();
+    $this->actingAs($this->user)->post("/posts")->assertSessionHasErrors(["title", "body", "status"]);
+});
 
-    $this->actingAs($user)->post("/posts")->assertSessionHasErrors(["title", "body", "status"]);
+it("authenticated user can visit the create post route", function() {
+    $response = $this->actingAs($this->user)->get('/posts/create');
+    $response->assertStatus(200);
+});
+
+it("unauthenticated user cannot visit create post route", function() {
+    $response = $this->get('/posts/create');
+    $response->assertStatus(302);
+});
+
+it("create post form has title, body and status", function() {
+    $response = $this->actingAs($this->user)->get('/posts/create');
+    $response->assertSee('Title');
+    $response->assertSee('Body');
+    $response->assertSee('Status');
 });
