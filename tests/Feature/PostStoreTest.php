@@ -19,7 +19,7 @@ test('authenticated user can create a post', function () {
         'user_id' => $this->user->id,
         'title' => 'test title',
         'body' => 'test body',
-        'status' => 'is_published',
+        'status' => 'published',
     ]);
 
     $response->assertRedirect('/');
