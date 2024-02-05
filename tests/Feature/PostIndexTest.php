@@ -34,3 +34,14 @@ it("redirects unauthenticated user", function () {
     $response = $this->get("/posts/" . $this->post->id . "/edit");
     $response->assertStatus(302);
 });
+
+it("abort if the user does not own the post", function () {
+    $user1 = User::factory()->create();
+    $post = $this->user->posts()->create([
+        "title" => "the post title",
+        "body" => "the post body",
+        "status" => "pending",
+    ]);
+
+    $this->actingAs($user1)->get('/posts/' . $post->id . '/edit')->assertStatus(403);
+});
