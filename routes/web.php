@@ -27,6 +27,7 @@ Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
 Route::get('/posts/create', [PostController::class, 'create'])->middleware('auth')->name('posts.create');
 Route::post('/posts', [PostController::class, 'store'])->middleware('auth')->name('posts.store');
 Route::get('/posts/{post:id}/edit', [PostController::class, 'edit'])->middleware('auth')->name('posts.edit');
+Route::put('/posts/{post:id}', [PostController::class, 'update'])->middleware('auth')->name('posts.update');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

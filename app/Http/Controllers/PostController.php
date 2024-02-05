@@ -61,9 +61,19 @@ class PostController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Post $post)
     {
-        //
+        $this->authorize('update', $post);
+
+        $validated = $request->validate([
+            "title" => "required",
+            "body" => "required",
+            "status" => "required",
+        ]);
+
+        $post->update($validated);
+
+        return to_route('posts.index');
     }
 
     /**
